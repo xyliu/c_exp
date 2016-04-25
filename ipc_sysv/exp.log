@@ -1,0 +1,53 @@
+== before run
+
+$ipcs -u
+ 
+------ Shared Memory Status --------
+segments allocated 0
+pages allocated 0
+pages resident  0
+pages swapped   0
+Swap performance: 0 attempts     0 successes
+ 
+------ Semaphore Status --------
+used arrays = 2
+allocated semaphores = 3
+ 
+------ Messages Status --------
+allocated queues = 0
+used headers = 0
+used space = 0 bytes
+
+
+== after ./demo
+
+$ ./demo 
+1 (NUM_SEMAPHORES=32)
+child 2963 FAIL at counter=127: 28
+child 2964 FAIL at counter=128: 28
+child 2965 FAIL at counter=129: 28
+child 2966 FAIL at counter=130: 28
+child 2967 FAIL at counter=131: 28
+child 2968 FAIL at counter=132: 28
+child 2969 FAIL at counter=133: 28
+child 2970 FAIL at counter=134: 28
+child 2971 FAIL at counter=135: 28
+child 2972 FAIL at counter=136: 28
+
+$ ipcs -u
+ 
+------ Shared Memory Status --------
+segments allocated 0
+pages allocated 0
+pages resident  0
+pages swapped   0
+Swap performance: 0 attempts     0 successes
+ 
+------ Semaphore Status --------
+used arrays = 128
+allocated semaphores = 4035
+ 
+------ Messages Status --------
+allocated queues = 0
+used headers = 0
+used space = 0 bytes
