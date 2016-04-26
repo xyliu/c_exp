@@ -14,6 +14,8 @@
 # bt
   dump backtrace
 
+# syntax
+  check c syntax
 
  
  
