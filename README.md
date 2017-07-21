@@ -17,5 +17,5 @@
 # syntax
   check c syntax
 
- 
- 
+# swig
+  a SWIG example for python/c
