@@ -28,7 +28,7 @@ int is_hypervisor()
 
 void get_hypervisor()
 {
-	CPUID cpuID(0x40000000); // Get CPU vendor
+	CPUID cpuID(0x40000000); // Get CPU hypervisor
 	string hyper("");
 	hyper += string((const char *)&cpuID.EBX(), 4);
 	hyper += string((const char *)&cpuID.ECX(), 4);
@@ -36,10 +36,24 @@ void get_hypervisor()
 	cout << "hypervisor = " << hyper << endl;
 }
 
+void get_hypervisor2()
+{
+	unsigned int base = 0x40000000;
+
+	for (base=0x40000000; base < 0x40010000; base+=0x100) {
+		CPUID cpuID(base); // Get CPU hypervisor
+		string hyper("");
+		hyper += string((const char *)&cpuID.EBX(), 4);
+		hyper += string((const char *)&cpuID.ECX(), 4);
+		hyper += string((const char *)&cpuID.EDX(), 4);
+		cout << std::hex << base << " hypervisor = " << hyper << endl;
+	}
+}
 
 int main(int argc, char *argv[]) {
 	get_vendor();
 	if (is_hypervisor())
 		get_hypervisor();
+	get_hypervisor2();
 	return 0;
 }
