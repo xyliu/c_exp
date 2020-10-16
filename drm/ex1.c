@@ -73,8 +73,58 @@ int ex2()
 	return 0;
 }
 
+
+static void *mmap_gem_buffer(int fd, uint32_t handle, uint64_t size)
+{
+	int rc;
+	struct drm_i915_gem_mmap mm = {
+		.handle = handle,
+		.offset = 0,
+		.size = size,
+	};
+
+	rc = drmIoctl(fd, DRM_IOCTL_I915_GEM_MMAP, &mm);
+	assert(rc == 0);
+
+	return (void *)mm.addr_ptr;
+}
+
+
+static void munmap_gem_buffer(void *map_ptr, uint64_t size)
+{
+	munmap(map_ptr, size);
+}
+
+
+int ex3() {
+	int fd;
+	uint32_t buf_handle;
+	uint64_t buf_size = 4096;
+	uint8_t *buf_ptr;
+
+	fd = drmOpenWithType("i915", NULL, DRM_NODE_RENDER);
+
+	assert(fd >= 0);
+
+	buf_handle = create_gem_buffer(fd, buf_size);
+	buf_ptr = mmap_gem_buffer(fd, buf_handle, buf_size);
+
+	memset(buf_ptr, 0, buf_size);
+	buf_ptr[0] = 1;
+
+	munmap_gem_buffer(buf_ptr, buf_size);
+	destroy_gem_buffer(fd, buf_handle);
+
+	drmClose(fd);
+	return 0;
+}
+
+
 int main(void)
 {
-	return ex2();
+	int ret;
+	// ret = ex2();
+	ret = ex3();
+	return ret;
 }
 
