@@ -120,11 +120,69 @@ int ex3() {
 }
 
 
+static void gem_pwrite(int fd, uint32_t handle, void *src, uint64_t offset, uint64_t size)
+{
+	int rc;
+	struct drm_i915_gem_pwrite gp = {
+		.handle = handle,
+		.offset = offset,
+		.size = size,
+		.data_ptr = (uint64_t) src,
+	};
+
+	rc = drmIoctl(fd, DRM_IOCTL_I915_GEM_PWRITE, &gp);
+	assert(rc == 0);
+}
+
+static void gem_pread(int fd, uint32_t handle, uint64_t offset, uint64_t size, void *dst)
+{
+	int rc;
+	struct drm_i915_gem_pread gp = {
+		.handle = handle,
+		.offset = offset,
+		.size = size,
+		.data_ptr = (uint64_t) dst,
+	};
+
+	rc = drmIoctl(fd, DRM_IOCTL_I915_GEM_PREAD, &gp);
+	assert(rc == 0);
+}
+
+
+int ex4()
+{
+	int fd;
+	uint32_t buf_handle;
+	uint64_t buf_size = 4096;
+	uint8_t tmp_buf[buf_size];
+	int data;
+
+	fd = drmOpenWithType("i915", NULL, DRM_NODE_RENDER);
+	assert(fd >= 0);
+
+	buf_handle = create_gem_buffer(fd, buf_size);
+
+	memset(tmp_buf, 0xFF, buf_size);
+	gem_pwrite(fd, buf_handle, tmp_buf, 0, buf_size);
+	gem_pread(fd, buf_handle, 0, sizeof(int), &data);
+	printf("data: 0x%x\n", data);
+
+	memset(tmp_buf, 0xFE, buf_size);
+	gem_pwrite(fd, buf_handle, tmp_buf, 0, buf_size);
+	gem_pread(fd, buf_handle, 0, sizeof(int), &data);
+	printf("data: 0x%x\n", data);
+
+	destroy_gem_buffer(fd, buf_handle);
+	drmClose(fd);
+	return 0;
+
+}
 int main(void)
 {
 	int ret;
 	// ret = ex2();
-	ret = ex3();
+	// ret = ex3();
+	ret = ex4();
 	return ret;
 }
 
